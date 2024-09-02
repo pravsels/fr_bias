@@ -1,0 +1,20 @@
+python /Users/santhoshnarayanan/Documents/Turing/GPU/MOSIP/facenet/src/align/align_dataset_mtcnn.py \
+/Users/santhoshnarayanan/Documents/Turing/GPU/MOSIP/data/train \
+/Users/santhoshnarayanan/Documents/Turing/GPU/MOSIP/data/train_182 \
+--image_size 182 --margin 44 --gpu_memory_fraction 0.8
+
+open .bash_profile
+export PYTHONPATH=$PYTHONPATH:/Users/santhoshnarayanan/Documents/Turing/GPU/MOSIP/facenet/src
+source .bash_profile
+pip install tf_slim
+
+# FINAL CONFIG
+python src/train_softmax.py \
+--logs_base_dir ../logs/facenet \
+--models_base_dir ../models/facenet \
+--data_dir ../data/train_182 \
+--image_size 160 \
+--model_def models.inception_resnet_v1 \
+--optimizer ADAM --learning_rate -1 --max_nrof_epochs 25 --batch_size 300 --keep_probability 0.8 --epoch_size 900 --use_fixed_image_standardization \
+--learning_rate_schedule_file data/learning_rate_schedule_classifier1.txt \
+--weight_decay 5e-4 --embedding_size 512 --validation_set_split_ratio 0.2 --validate_every_n_epochs 1 --gpu_memory_fraction 0.9
