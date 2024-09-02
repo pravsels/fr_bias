@@ -47,7 +47,7 @@ def main():
     torch.backends.cudnn.benchmark = True
 
     model_fname = 'deeplab_model/deeplab_model.pth'
-    dataset_root = '../../datasets/synthpar'
+    dataset_root = '../../test_dataset'
 
     assert os.path.isdir(dataset_root)
 

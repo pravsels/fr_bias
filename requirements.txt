@@ -1,0 +1,6 @@
+torch 
+requests 
+numpy  
+pillow 
+torchvision
+tqdm 
