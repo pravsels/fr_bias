@@ -18,7 +18,7 @@ from torch.utils.data import DataLoader
 from PIL import Image
 
 import deeplab
-from data_loader import CelebASegmentation
+from data_loader import FlexibleImageSegmentation
 from utils import download_file
 from tqdm import tqdm 
 
@@ -51,8 +51,8 @@ def main():
 
     assert os.path.isdir(dataset_root)
 
-    dataset = CelebASegmentation(dataset_root, 
-                                 crop_size=513)
+    dataset = FlexibleImageSegmentation(dataset_root, 
+                                        crop_size=513)
     dataloader = DataLoader(dataset, 
                             batch_size=batch_size, 
                             shuffle=False, 
@@ -91,20 +91,26 @@ def main():
     for batch_idx, image_batch in enumerate(tqdm(dataloader, desc='skinning faces...')):
         inputs = image_batch.cuda()
         outputs = model(inputs)
-
         _, preds = torch.max(outputs, 1)
         preds = preds.data.cpu().numpy().squeeze().astype(np.uint8)
 
         for i in range(preds.shape[0]):
-            img_index = batch_idx * batch_size + i 
+            img_index = batch_idx * batch_size + i
             if img_index >= len(dataset):
                 break
 
-            img_name = os.path.basename(dataset.images[img_index])
+            img_path = dataset.images[img_index]
+            relative_path = os.path.relpath(img_path, dataset_root)
+            mask_filename = os.path.splitext(os.path.basename(img_path))[0] + '_mask.png'
+            
+            # Construct the output path while preserving the folder structure
+            output_path = os.path.join(output_dir, os.path.dirname(relative_path), mask_filename)
+            
+            # Ensure the output directory exists
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
             mask_pred = Image.fromarray(preds[i])
             mask_pred = mask_pred.resize((resolution, resolution), Image.NEAREST)
-
-            output_path = os.path.join(output_dir, img_name.split('.')[0] + '_mask.png')
             mask_pred.save(output_path)
 
 if __name__ == "__main__":
