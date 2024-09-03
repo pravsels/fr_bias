@@ -33,11 +33,19 @@ args = parser.parse_args()
 
 
 resnet_file_spec = dict(
+                        # file_url='https://drive.google.com/uc?id=1oRGgrI4KNdefbWVpw0rRkEP1gbJIRokM', 
                         file_path='deeplab_model/R-101-GN-WS.pth.tar', 
+                        # file_size=178260167, 
+                        # file_md5='aa48cc3d3ba3b7ac357c1489b169eb32'
                         )
+
 deeplab_file_spec = dict(
+                        # file_url='https://drive.google.com/uc?id=1w2XjDywFr2NjuUWaLQDRktH7VwIfuNlY', 
                          file_path='deeplab_model/deeplab_model.pth', 
+                        #  file_size=464446305, 
+                        #  file_md5='8e8345b1b9d95e02780f9bed76cc0293'
                          )
+
 
 def main():
     resolution = args.resolution
