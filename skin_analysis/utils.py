@@ -2,6 +2,9 @@ import torchvision.transforms as transforms
 import math 
 import os 
 from tqdm import tqdm 
+import uuid 
+import hashlib
+import glob
 
 def download_file(session, file_spec, chunk_size=128, num_attempts=10):
     file_path = file_spec['file_path']
