@@ -15,3 +15,16 @@ pip install -r requirements.txt
 
 
 ## Running skin analysis scripts 
+
+To get face mask segmentations for a dataset: 
+```
+cd skin_analysis
+
+python run_deeplab.py 
+```
+
+The dataset path is set as the `dataset_root` variable in `main()`. 
+
+
+Following this, we can now create color distance plots, color histogram plots and color tables using the scripts in `skin_analysis` folder. 
+

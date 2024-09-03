@@ -92,54 +92,61 @@ def get_skin_values(img, mask, n_clusters=5):
 
     return res
 
-def process_image(image_file):
-    dataset_root = '../../datasets/synthpar'
-    masks_dir = os.path.join(dataset_root, 'masks')
+def find_image_files(root_dir):
+    image_files = []
+    for dirpath, dirnames, filenames in os.walk(root_dir):
+        for filename in filenames:
+            if filename.endswith('.png') and not filename.endswith('_mask.png'):
+                image_files.append(os.path.relpath(os.path.join(dirpath, filename), root_dir))
+    return image_files
 
+def process_image(args):
+    image_file, dataset_root, masks_dir = args
+    
     # Find the corresponding mask file
-    mask_file = image_file.split('.')[0] + '_mask.png'
+    image_path = os.path.join(dataset_root, image_file)
+    mask_file = os.path.splitext(image_file)[0] + '_mask.png'
     mask_path = os.path.join(masks_dir, mask_file)
 
     # Check if the mask file exists
     if not os.path.exists(mask_path):
         print(f"Mask file not found for image: {image_file}. Skipping.")
+        print(f'Mask path : {mask_path}')
         return None
 
-    fimg = os.path.join(dataset_root, image_file)
-    fmask = mask_path
-    img_original = imread(fimg)
-    mask = imread(fmask)
+    img_original = imread(image_path)
+    mask = imread(mask_path)
 
     # get values
     tmp = get_skin_values(np.asarray(img_original), np.asarray(mask) == 1)
 
     # Return the results as a dictionary
     return {
-        'image': image_file,
-        'lum': tmp['lum'],
-        'lum_std': tmp['lum_std'],
-        'hue': tmp['hue'],
-        'hue_std': tmp['hue_std'],
-        'red': tmp['red'],
-        'red_std': tmp['red_std'],
-        'green': tmp['green'],
-        'green_std': tmp['green_std'],
-        'blue': tmp['blue'],
-        'blue_std': tmp['blue_std']
+        'filename': image_file,
+        'lum': tmp['lum'], 'lum_std': tmp['lum_std'],
+        'hue': tmp['hue'], 'hue_std': tmp['hue_std'],
+        'red': tmp['red'], 'red_std': tmp['red_std'],
+        'green': tmp['green'], 'green_std': tmp['green_std'],
+        'blue': tmp['blue'], 'blue_std': tmp['blue_std']
     }
 
 def main():
-    dataset_root = '../../datasets/synthpar'
+    dataset_name = 'test_dataset'
+    dataset_root = f'../../{dataset_name}'
     masks_dir = os.path.join(dataset_root, 'masks')
+    
+    print('Dataset root:', dataset_root)
+    print('Masks directory:', masks_dir)
 
-    # Get a list of image files and their corresponding mask files
-    image_files = [f for f in os.listdir(dataset_root) if f.endswith('.png')]
+    # Get a list of image files recursively
+    image_files = find_image_files(dataset_root)
 
-    image_files = image_files
-
-    # Create a CSV file to store the results
-    csv_file = 'SynthPar.csv'
-    fieldnames = ['image', 
+    # Create color_results folder
+    color_results_dir = './color_results'
+    os.makedirs(color_results_dir, exist_ok=True)
+    # Create a CSV file to store the results    
+    csv_file = os.path.join(color_results_dir, f'{dataset_name}.csv')
+    fieldnames = ['filename', 
                   'lum', 'lum_std', 
                   'hue', 'hue_std', 
                   'red', 'red_std', 
@@ -153,9 +160,12 @@ def main():
         pool = mp.Pool(processes=16)
 
         # Process images in parallel
-        results = list(tqdm(pool.imap(process_image, image_files), 
-                                      total=len(image_files), 
-                                      desc='processing images...'))
+        args_list = [(image_file, dataset_root, masks_dir) for image_file in image_files[:10]]
+        results = list(tqdm(pool.imap(process_image, args_list), 
+                            total=len(image_files), 
+                            desc='processing images...'))
+
+        import pdb; pdb.set_trace()
 
         for result in results:
             if result is not None:
@@ -167,6 +177,6 @@ def main():
 
     print(f"Results saved to {csv_file}")
 
-
 if __name__ == "__main__":
     main()
+

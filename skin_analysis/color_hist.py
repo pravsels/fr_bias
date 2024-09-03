@@ -8,9 +8,8 @@ color_dir = './color_results'
 datasets = [
     {'name': 'CelebAMask-HQ', 'csv_file': f'{color_dir}/CelebA.csv'},
     {'name': 'FFHQ', 'csv_file': f'{color_dir}/FFHQ.csv'},
-    {'name': 'SynthPar', 'csv_file': f'{color_dir}/SynthPar.csv'},
+    {'name': 'test_dataset', 'csv_file': f'{color_dir}/test_dataset.csv'},
     {'name': 'VGG_Face2', 'csv_file': f'{color_dir}/VGG_Face2.csv'},
-    {'name': '80k', 'csv_file': f'{color_dir}/80k.csv'},
 ]
 
 def read_data_from_csv(csv_file):
