@@ -55,12 +55,19 @@ def main():
     torch.backends.cudnn.benchmark = True
 
     model_fname = 'deeplab_model/deeplab_model.pth'
-    dataset_root = '../../test_dataset'
+    dataset_root = '../synthpar2'
 
     assert os.path.isdir(dataset_root)
 
+    output_dir = os.path.join(dataset_root, 'masks')
+    os.makedirs(output_dir, exist_ok=True)
+
     dataset = FlexibleImageSegmentation(dataset_root, 
+                                        output_dir,
                                         crop_size=513)
+
+    # import pdb; pdb.set_trace()
+    
     dataloader = DataLoader(dataset, 
                             batch_size=batch_size, 
                             shuffle=False, 
@@ -92,9 +99,6 @@ def main():
     checkpoint = torch.load(model_fname)
     state_dict = {k[7:]: v for k, v in checkpoint['state_dict'].items() if 'tracked' not in k}
     model.load_state_dict(state_dict)
-
-    output_dir = os.path.join(dataset_root, 'masks')
-    os.makedirs(output_dir, exist_ok=True)
 
     for batch_idx, image_batch in enumerate(tqdm(dataloader, desc='skinning faces...')):
         inputs = image_batch.cuda()

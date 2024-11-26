@@ -53,7 +53,20 @@ except Exception as e:
 # Filter for shard files
 shard_files = [f for f in repo_files if f.startswith("shard_") and f.endswith(".zip")]
 
-for shard_filename in shard_files:
+st_type = input("Enter ST type (e.g. ST1, ST2): ")
+if not st_type.startswith("ST") or not st_type[2:].isdigit() or not 1 <= int(st_type[2:]) <= 8:
+    print("Invalid input. Please enter ST1 through ST8")
+    exit() 
+
+filter_st = lambda files, st: list(filter(lambda x: st in x, files))
+# filtered_files = filter_st(shard_files, st_type)
+filtered_files = sorted(filter_st(shard_files, st_type), key=lambda x: int(x.split('_')[1]))
+
+print('first 5 in the list of filtered files : ', filtered_files[:5])
+
+# import pdb; pdb.set_trace()
+
+for shard_filename in filtered_files:
     success = download_and_extract_shard(shard_filename)
     if not success:
         print(f"Failed to process {shard_filename}")
