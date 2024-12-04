@@ -8,6 +8,7 @@ from sklearn import cluster
 from skimage.io import imread
 from tqdm import tqdm 
 import multiprocessing as mp
+import argparse
 
 def read_img(fpath):
     img = Image.open(fpath).convert('RGB')
@@ -98,6 +99,7 @@ def find_image_files(root_dir):
         for filename in filenames:
             if filename.endswith('.png') and not filename.endswith('_mask.png'):
                 image_files.append(os.path.relpath(os.path.join(dirpath, filename), root_dir))
+
     return image_files
 
 def process_image(args):
@@ -131,9 +133,14 @@ def process_image(args):
     }
 
 def main():
-    dataset_name = 'test_dataset'
-    dataset_root = f'../../{dataset_name}'
-    masks_dir = os.path.join(dataset_root, 'masks')
+    parser = argparse.ArgumentParser(description='Extract skin scores from images')
+    parser.add_argument('dir', type=str,
+                        help='Folder to process (ST1, ST2, etc)')
+    
+    args = parser.parse_args()
+    
+    dataset_root = f'../synthpar2/{args.dir}'
+    masks_dir = os.path.join('../synthpar2/masks', args.dir)
     
     print('Dataset root:', dataset_root)
     print('Masks directory:', masks_dir)
@@ -145,7 +152,7 @@ def main():
     color_results_dir = './color_results'
     os.makedirs(color_results_dir, exist_ok=True)
     # Create a CSV file to store the results    
-    csv_file = os.path.join(color_results_dir, f'{dataset_name}.csv')
+    csv_file = os.path.join(color_results_dir, f'{args.dir}.csv')
     fieldnames = ['filename', 
                   'lum', 'lum_std', 
                   'hue', 'hue_std', 
@@ -157,15 +164,13 @@ def main():
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
-        pool = mp.Pool(processes=16)
+        pool = mp.Pool(processes=35)
 
         # Process images in parallel
-        args_list = [(image_file, dataset_root, masks_dir) for image_file in image_files[:10]]
+        args_list = [(image_file, dataset_root, masks_dir) for image_file in image_files]
         results = list(tqdm(pool.imap(process_image, args_list), 
                             total=len(image_files), 
                             desc='processing images...'))
-
-        import pdb; pdb.set_trace()
 
         for result in results:
             if result is not None:

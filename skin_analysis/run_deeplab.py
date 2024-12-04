@@ -25,9 +25,9 @@ from tqdm import tqdm
 parser = argparse.ArgumentParser()
 parser.add_argument('--resolution', type=int, default=256,
 					help='segmentation output size')
-parser.add_argument('--workers', type=int, default=4,
+parser.add_argument('--workers', type=int, default=8,
 					help='number of data loading workers')
-parser.add_argument('--batch_size', type=int, default=2,
+parser.add_argument('--batch_size', type=int, default=16,
 					help='batch size of images processed')
 args = parser.parse_args()
 
@@ -65,8 +65,6 @@ def main():
     dataset = FlexibleImageSegmentation(dataset_root, 
                                         output_dir,
                                         crop_size=513)
-
-    # import pdb; pdb.set_trace()
     
     dataloader = DataLoader(dataset, 
                             batch_size=batch_size, 

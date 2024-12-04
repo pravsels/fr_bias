@@ -25,6 +25,8 @@ python run_deeplab.py
 
 The dataset path is set as the `dataset_root` variable in `main()`. 
 
-
 Following this, we can now create color distance plots, color histogram plots and color tables using the scripts in `skin_analysis` folder. 
+
+
+First, you have to extract skin luminance and hue values using the masks we created above. 
 

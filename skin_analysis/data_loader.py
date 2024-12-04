@@ -106,6 +106,8 @@ class FlexibleImageSegmentation(data.Dataset):
                       with Image.open(path) as img:
                           img.verify()  # Verify it's actually an image
                       images.append(path)
+                      if len(images) > 200:
+                        return images, stats  
                   except (IOError, OSError, Image.UnidentifiedImageError) as e:
                       stats['corrupted'] += 1
                       print(f"Skipping corrupted image {path}: {str(e)}")
